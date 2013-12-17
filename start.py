@@ -25,6 +25,7 @@
 from WacomDevice import *
 from GUI import *
 from XDevice import *
+from System import *
 
 
 class Start():
@@ -34,21 +35,10 @@ class Start():
 		self.buildGUIMenu()
 		self.gui.show()
 
-
-	def rotateDevices(self, item, mode=None):
-		if mode == None:
-			#entering automatic mode
-			if self.system.display.getOrientation() == b'inverted':
-				mode = 0
-			else:
-				mode = 180
-		for device in self.system.devices:
-			device.rotate(mode)
-
 	def buildGUIMenu(self):
 
 		# add rotate entry
-		self.gui.addMenuEntry(self.gui.menu, "rotate 180°").connect("activate", self.rotateDevices)
+		self.gui.addMenuEntry(self.gui.menu, "rotate 180°").connect("activate", self.system.rotateDevices)
 
 
 

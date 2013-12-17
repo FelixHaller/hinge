@@ -2,10 +2,12 @@ __author__ = 'Felix Haller'
 
 from subprocess import check_call, Popen, PIPE
 
+
 class System():
 	"""
 	This class handles everything that has to do with the system in general
 	"""
+
 	def __init__(self):
 		self.devices = []
 		self.retrDeviceNames()
@@ -30,3 +32,13 @@ class System():
 
 		self.display = XDevice()
 		self.devices.append(self.display)
+
+	def rotateDevices(self, item, mode=None):
+		if mode == None:
+			#entering automatic mode
+			if self.display.getOrientation() == b'inverted':
+				mode = 0
+			else:
+				mode = 180
+		for device in self.devices:
+			device.rotate(mode)

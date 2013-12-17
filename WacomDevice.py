@@ -1,4 +1,5 @@
-__author__ = 'felix'
+__author__ = 'Felix Haller'
+
 from Helper import *
 
 class WacomDevice:

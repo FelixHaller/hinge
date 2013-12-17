@@ -1,4 +1,4 @@
-__author__ = 'felix'
+__author__ = 'Felix Haller'
 
 from Helper import *
 from subprocess import check_call, Popen, PIPE

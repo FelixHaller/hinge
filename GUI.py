@@ -1,3 +1,5 @@
+__author__ = 'Felix Haller'
+
 from gi.repository import Gtk
 from gi.repository import AppIndicator3
 
