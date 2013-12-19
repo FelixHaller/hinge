@@ -5,7 +5,7 @@ from Helper import *
 class WacomDevice:
     def __init__(self, name: str):
         self.name = name
-        self.rotModes = {0: "none", 90: "foo", 180: "half"}
+        self.rotModes = {0: "none", 2: "half"}
 
     def getDeviceName(self):
         return (self.name)
@@ -27,19 +27,4 @@ class WacomDevice:
 
         #self.sendWacomSystemCall('--set', self.name, 'touch', 'on')
 
-class Eraser(WacomDevice):
-    def __init__(self, name: str):
-        """
-        Bli Bla Blubber
-        """
-        WacomDevice.__init__(self, name)
 
-
-class Stylus(WacomDevice):
-    def __init__(self, name: str):
-        WacomDevice.__init__(self, name)
-
-
-class Touch(WacomDevice):
-    def __init__(self, name: str):
-        WacomDevice.__init__(self, name)

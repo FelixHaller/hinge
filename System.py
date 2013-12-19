@@ -1,7 +1,11 @@
 __author__ = 'Felix Haller'
 
 from subprocess import check_call, Popen, PIPE
-
+from WacomDevice import *
+from Eraser import *
+from Stylus import *
+from Touch import *
+from XDevice import *
 
 class System():
 	"""
@@ -33,12 +37,13 @@ class System():
 		self.display = XDevice()
 		self.devices.append(self.display)
 
-	def rotateDevices(self, item, mode=None):
+	def rotateDevices(self, item=None, mode=None):
 		if mode == None:
 			#entering automatic mode
+			print(self.display.getOrientation())
 			if self.display.getOrientation() == b'inverted':
 				mode = 0
 			else:
-				mode = 180
+				mode = 2
 		for device in self.devices:
 			device.rotate(mode)

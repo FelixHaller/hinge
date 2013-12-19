@@ -28,19 +28,6 @@ from XDevice import *
 from System import *
 
 
-class Start():
+class CLI():
 	def __init__(self):
-		self.system = System()
-		self.gui = GUI()
-		self.buildGUIMenu()
-		self.gui.show()
-
-	def buildGUIMenu(self):
-
-		# add rotate entry
-		self.gui.addMenuEntry(self.gui.menu, "rotate 180°").connect("activate", self.system.rotateDevices)
-
-
-
-if __name__ == "__main__":
-	Start()
+		self.system = System().rotateDevices()
