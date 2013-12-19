@@ -22,21 +22,17 @@
 # <http://www.gnu.org/licenses/>
 #
 
-from WacomDevice import *
 from GUI import *
-from XDevice import *
 from System import *
 
 
 class Daemon():
 	def __init__(self):
-		self.system = System()
 		self.gui = GUI()
-		self.buildGUIMenu()
+		self.system = System(self.gui)
+
 		self.gui.show()
 
-	def buildGUIMenu(self):
 
-		# add rotate entry
-		self.gui.addMenuEntry(self.gui.menu, "rotate 180°").connect("activate", self.system.rotateDevices)
+
 
