@@ -6,7 +6,7 @@ from Helper import *
 class WacomDevice:
 	def __init__(self, name: str):
 		self.name = name
-		self.rotModes = ["none", "cw", "half", "ccw"]
+		self.rotModes = ["none", "ccw", "half", "cw"]
 
 	def getDeviceName(self):
 		return (self.name)

@@ -16,7 +16,6 @@ class System():
 		self.devices = []
 		self.retrDeviceNames()
 		self.gui = gui
-
 		if self.gui != None:
 			self.addMenusToGUI()
 
@@ -45,8 +44,7 @@ class System():
 				self.devices.append(self.touchDev)
 
 
-	def rotateDevices(self, menuItem=None, mode=None):
-
+	def rotateDevices(self, menuItem=None, mode:int=None):
 		if mode == None:
 		#entering automatic mode
 			if self.display.getOrientation() == b'inverted':
@@ -87,7 +85,7 @@ class System():
 			else:
 				self.touchDev.turn(mode)
 
-	def tglHoverClick(self, menuItem=None, mode=None):
+	def tglHoverClick(self, menuItem=None, mode:str=None):
 		if self.stylusDev != None:
 			if mode == None:
 				status = self.stylusDev.isHover()
