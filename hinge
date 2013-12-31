@@ -24,8 +24,8 @@
 
 
 import sys, getopt
-from Daemon import Daemon
-from System import System
+from hinge_modules.Daemon import Daemon
+from hinge_modules.System import System
 
 
 def main(argv):
@@ -49,6 +49,9 @@ def main(argv):
 			elif opt in ("-r", "--Rotate"):
 				if arg in ("normal","left","right","inverted"):
 					System().rotateDevices(mode={"normal":0,"left":1,"inverted":2,"right":3}[arg])
+				else:
+					printHelp()
+					sys.exit(2)
 			elif opt in ("-T", "--Touch"):
 				if arg in ("on", "off"):
 					System().tglFingerTouch(mode=arg)
@@ -96,6 +99,7 @@ parameters:
 -n, --normal                   reset settings to default
 -r, --rotate <orientation>     set a specific orientation (absolute)
                                possible values: normal, left, right, inverted
+-w, --writing                  turn 180°, disable touch input, enable hover click
 ''')
 
 if __name__ == "__main__":

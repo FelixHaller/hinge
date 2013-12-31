@@ -1,6 +1,6 @@
 __author__ = 'Felix Haller'
 
-from Helper import *
+from hinge_modules.Helper import *
 from subprocess import check_call, Popen, PIPE
 
 
@@ -24,10 +24,17 @@ class XDevice():
 				else:
 					self.orientation = b'normal'
 	def getOrientation(self):
+		#@todo jetzt gibt es doppelte Einträge für getOreientation und orientation
 		self.readSettings()
 		return self.orientation
 
 
-	def rotate(self, mode: int):
+	def rotate(self, mode):
+		"""
+		Rotate the Screen. In fact we call "xrandr" with the -o option and an integer from 0-3
+
+		:param mode: possible values 0,1,2,3 (for [normal, left, inverted, right])
+		:type mode: int
+		"""
 		Helper.sendSystemCall("xrandr", "-o", self.rotModes[mode])
 

@@ -1,6 +1,6 @@
 __author__ = 'Felix Haller'
 
-from Helper import *
+from hinge_modules.Helper import *
 
 
 class WacomDevice:

@@ -1,5 +1,5 @@
-from GUI import *
-from System import *
+from hinge_modules.GUI import GUI
+from hinge_modules.System import System
 
 
 class Daemon():

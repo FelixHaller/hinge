@@ -1,4 +1,4 @@
-from WacomDevice import *
+from hinge_modules.WacomDevice import WacomDevice
 
 __author__ = 'Felix Haller'
 

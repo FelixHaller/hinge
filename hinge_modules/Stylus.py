@@ -1,4 +1,6 @@
-from WacomDevice import *
+from hinge_modules.WacomDevice import WacomDevice
+from hinge_modules.Helper import Helper
+
 
 __author__ = 'Felix Haller'
 
@@ -21,6 +23,7 @@ class Stylus(WacomDevice):
 		elif (status == 0):
 			return(False)
 		else:
+			#@todo sollte hier auch irgendeinen return code geben
 			print("can not get hover-click status of" + self.name)
 
 	def setHoverClick(self, mode):

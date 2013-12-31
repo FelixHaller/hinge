@@ -1,6 +1,6 @@
 __author__ = 'Felix Haller'
 
-from onScreenKeyboard import *
+from hinge_modules.onScreenKeyboard import onScreenKeyboard
 
 class onBoard(onScreenKeyboard):
 	def __init__(self):
