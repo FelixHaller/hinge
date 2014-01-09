@@ -29,7 +29,9 @@ from hinge_modules.System import System
 
 
 def main(argv):
-	if (len(sys.argv) > 1):
+	if (len(sys.argv) < 2):
+		printHelp()
+	else:
 		CLIArgs = sys.argv[1:]
 		try:
 			opts, args = getopt.getopt(CLIArgs,"hO:odfT:twnr:",["flip", "daemon", "help", "Touch=",
@@ -79,17 +81,12 @@ def main(argv):
 				s.tglHoverClick(mode="0")
 				s.tglFingerTouch(mode="on")
 
-	else:
-		printHelp()
 def printHelp():
 	print(
-	'''convertible-tool 0.0.1
-2013 Felix Haller <ich@ein-freier-mensch.de>
+	'''
+Usage: hinge [options]
 
-You can use this tool either as a CLI to perform some actions, or start
-it as a daemon with an indicator/systray menu.
-
-parameters:
+options:
 -d                             start daemon
 -f, --flip                     flip the rotation of the screen (rotate 180°)
 -T, --Touch on,off             enable/disable finger touch input
@@ -99,7 +96,8 @@ parameters:
 -n, --normal                   reset settings to default
 -r, --rotate <orientation>     set a specific orientation (absolute)
                                possible values: normal, left, right, inverted
--w, --writing                  turn 180°, disable touch input, enable hover click
+-w, --writing                  turn 180°, disable touch input, enable hover
+                               click
 ''')
 
 if __name__ == "__main__":

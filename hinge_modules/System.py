@@ -1,18 +1,18 @@
-__author__ = 'Felix Haller'
-
 from subprocess import check_call, Popen, PIPE
+import sys
 from hinge_modules.Eraser import Eraser
 from hinge_modules.Stylus import Stylus
 from hinge_modules.Touch import Touch
 from hinge_modules.XDevice import XDevice
 
+__author__ = 'Felix Haller'
+
 
 class System():
 	"""
 	This class handles everything that has to do with the system in general.
-	Actually it is our "Controller" in a MCV - Concept Model.
+	Actually it is our "controller" in a MCV - Concept Model.
 	"""
-
 
 	def __init__(self, gui=None):
 		"""4
@@ -37,7 +37,11 @@ class System():
 		"""
 		Get the details of all connected Wacom Devices by using the "xsetwacom" command.
 		"""
-		output = Popen(["xsetwacom", "--list", "devices"], stdout=PIPE).communicate()[0]
+		try:
+			output = Popen(["xsetwacom", "--list", "devices"], stdout=PIPE).communicate()[0]
+		except FileNotFoundError:
+			print("'xsetwacom' command not found.")
+			sys.exit(-1)
 		devices_raw = output.rstrip().split(b'\n')
 		devices = []
 
@@ -47,6 +51,10 @@ class System():
 			devices.append(line.split(b'\t'))
 
 		for entry in devices:
+			if len(entry) != 3:
+				print("unexpected entry format")
+				continue
+
 			if 'STYLUS' in entry[2].decode("utf-8"):
 				self.stylusDev = Stylus(entry[0].rstrip().decode("UTF-8"))
 				self.devices.append(self.stylusDev)
@@ -73,7 +81,7 @@ class System():
 		:param mode: 0, 1, 2 or 3 for normal, left, inverted or right orientation
 		:type mode: int
 		"""
-		if mode == None:
+		if mode is None:
 			#entering automatic mode
 			if self.display.getOrientation() == b'normal':
 				mode = 2
@@ -87,17 +95,17 @@ class System():
 		Add rotate entry if there is any device (X, stylus, etc...)
 		however....there should be at least the XDevice.
 		"""
-		if (len(self.devices) > 0):
+		if len(self.devices) > 0:
 
 			self.gui.addMenuEntry(self.gui.menu, "rotate 180°").connect("activate", self.rotateDevices)
 		else:
 			self.gui.setHeaderLabel("Error: no devices found")
 
 		# if there is a touch device add an menu to en/disable the touch input
-		if (self.touchDev != None):
+		if self.touchDev is not None:
 			self.gui.addMenuEntry(self.gui.menu, "toggle Touch").connect("activate", self.tglFingerTouch)
 
-		if (self.stylusDev != None):
+		if self.stylusDev is not None:
 			self.gui.addMenuEntry(self.gui.menu, "toggle Hover-Click").connect("activate", self.tglHoverClick)
 
 
@@ -111,12 +119,12 @@ class System():
 		:type mode: str
 
 		"""
-		if self.touchDev != None:
-			if mode == None:
+		if self.touchDev is not None:
+			if mode is None:
 				status = self.touchDev.isEnabled()
 				if status:
 					self.touchDev.turn("off")
-				elif status == False:
+				elif status is False:
 					self.touchDev.turn("on")
 			else:
 				self.touchDev.turn(mode)
@@ -130,12 +138,12 @@ class System():
 		:param mode: turn it "on" or "off"
 		:type mode: str
 		"""
-		if self.stylusDev != None:
-			if mode == None:
+		if self.stylusDev is not None:
+			if mode is None:
 				status = self.stylusDev.isHover()
 				if status:
 					self.stylusDev.setHoverClick("0")
-				elif status == False:
+				elif not status:
 					self.stylusDev.setHoverClick("1")
 			else:
 				self.stylusDev.setHoverClick(mode)
