@@ -1,18 +1,23 @@
 __author__ = 'Felix Haller'
 
 from hinge_modules.Helper import *
+from subprocess import Popen, PIPE
+
 
 
 class WacomDevice:
 	def __init__(self, name: str):
-		self.name = name
-		self.rotModes = ["none", "ccw", "half", "cw"]
+		self._name = name
+		self._rotModes = ["none", "ccw", "half", "cw"]
 
-	def getDeviceName(self):
-		return (self.name)
+
+	@property
+	def name(self):
+		return self._name
+
 
 	def rotate(self, mode:int):
-		Helper.sendSystemCall('xsetwacom', '--set', self.name, 'rotate', self.rotModes[mode])
+		Helper.sendSystemCall('xsetwacom', '--set', self._name, 'rotate', self._rotModes[mode])
 
 	def getOrientation(self):
 		"""
@@ -21,13 +26,16 @@ class WacomDevice:
 		pass
 
 	def turn(self, mode):
-		Helper.sendSystemCall('xsetwacom', '--set', self.name, 'touch', mode)
+		Helper.sendSystemCall('xsetwacom', '--set', self._name, 'touch', mode)
 
 	def isEnabled(self):
-		status = Popen(["xsetwacom", "--get", self.name, "touch"], stdout=PIPE).communicate()[0].decode("UTF-8").strip()
-		if (status == "on"):
-			return(True)
-		elif (status == "off"):
-			return(False)
+		try:
+			status = Popen(["xsetwacom", "--get", self._name, "touch"], stdout=PIPE).communicate()[0].decode("UTF-8").strip()
+		except:
+			print("could not get enabled/disabled status of " + self._name)
+			return False
+
+		if status == "on":
+			return True
 		else:
-			print("can not get enabled/disabled status of" + self.name)
+			return False

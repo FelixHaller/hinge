@@ -8,7 +8,3 @@ class Daemon():
 		self.system = System(self.gui)
 
 		self.gui.show()
-
-
-
-

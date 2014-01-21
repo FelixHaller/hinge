@@ -34,56 +34,102 @@ def main(argv):
 	else:
 		CLIArgs = sys.argv[1:]
 		try:
-			opts, args = getopt.getopt(CLIArgs,"hO:odfT:twnr:",["flip", "daemon", "help", "Touch=",
-																"toogle-touch", "Hover-click=", "toggle-hover-click",
-																"writing", "normal", "Rotate="])
+			opts, args = getopt.getopt(CLIArgs,
+									   "hO:odfT:tW:wnr:",
+									   ["flip",
+										"daemon",
+										"help",
+										"Touch=",
+										"toggle-touch",
+										"Hover-click=",
+										"toggle-hover-click",
+										"writing=",
+										"toggle-writing",
+										"normal",
+										"Rotate="
+									   ]
+			)
 		except getopt.GetoptError:
-			printHelp()
-			sys.exit(2)
+			printHelp(2)
 		for opt, arg in opts:
 			if opt in ("-h", "--help"):
 				printHelp()
-				sys.exit()
 			elif opt in ("-d", "--daemon"):
 				Daemon()
 			elif opt in ("-f", "--flip"):
 				System().rotateDevices()
 			elif opt in ("-r", "--Rotate"):
-				if arg in ("normal","left","right","inverted"):
-					System().rotateDevices(mode={"normal":0,"left":1,"inverted":2,"right":3}[arg])
+				if arg in ("normal", "left", "right", "inverted"):
+					System().rotateDevices(mode={"normal": 0, "left": 1, "inverted": 2, "right": 3}[arg])
 				else:
-					printHelp()
-					sys.exit(2)
+					printHelp(2)
 			elif opt in ("-T", "--Touch"):
 				if arg in ("on", "off"):
 					System().tglFingerTouch(mode=arg)
 				else:
-					printHelp()
-					sys.exit(2)
+					printHelp(2)
 			elif opt in ("-t", "--toggle-touch"):
 				System().tglFingerTouch()
 			elif opt in ("-O", "--Hover-click"):
 				if arg in ("on", "off"):
-					System().tglHoverClick(mode={"off":"0","on":"1"}[arg])
+					System().tglHoverClick(mode={"off": "0", "on": "1"}[arg])
 				else:
-					printHelp()
-					sys.exit(2)
+					printHelp(2)
 			elif opt in ("-o", "--toggle-hover-click"):
 				System().tglHoverClick()
-			elif opt in ("-w", "--writing"):
+			elif opt in ("-W", "--writing"):
 				s = System()
-				s.tglHoverClick(mode="1")
-				s.tglFingerTouch(mode="off")
-				s.rotateDevices()
+				if arg in ("on", "off"):
+					writingMode(s, arg)
+				else:
+					printHelp(2)
+			elif opt in ("-w", "--toggle-writing"):
+				s = System()
+				writingMode(s)
 			elif opt in ("-n", "--normal"):
 				s = System()
-				s.rotateDevices(mode=0)
-				s.tglHoverClick(mode="0")
-				s.tglFingerTouch(mode="on")
+				normalMode(s)
 
-def printHelp():
+
+def writingMode(sysObj, arg=None):
+	"""
+	This is a helper function to make it possible to toggle the writing mode
+	(my favorite).
+	The decision which mode to choose depends on the current display orientation.
+	Only if it's in the "normal" state the writing mode will be applied. any other state
+	will lead to the normal (-n) mode to be applied.
+
+	:param sysObj: has to be an instance of hinge_modules.System.System()
+	:param arg: either "on" or "off" or nothing for toggeling
+	"""
+	if arg is None:
+		if sysObj.display.getOrientation() == b'normal':
+			arg = "on"
+		else:
+			normalMode(sysObj)
+			return
+	sysObj.tglHoverClick(mode={"on": "1", "off": "0"}[arg])
+	sysObj.tglFingerTouch(mode={"on": "off", "off": "on"}[arg])
+	sysObj.rotateDevices(mode={"off": 0, "on": 2}[arg])
+
+
+def normalMode(sysObj):
+	"""
+	Activates the normal mode:
+	- normal display/input devices orientation
+	- HoverClick disabled
+	- Touch input enabled
+
+	:param sysObj: has to be an instance of hinge_modules.System.System()
+	"""
+	sysObj.rotateDevices(mode=0)
+	sysObj.tglHoverClick(mode="0")
+	sysObj.tglFingerTouch(mode="on")
+
+
+def printHelp(errCode=0):
 	print(
-	'''
+'''
 Usage: hinge [options]
 
 options:
@@ -96,9 +142,12 @@ options:
 -n, --normal                   reset settings to default
 -r, --rotate <orientation>     set a specific orientation (absolute)
                                possible values: normal, left, right, inverted
--w, --writing                  turn 180°, disable touch input, enable hover
-                               click
+-W, --writing on,off           enables/disables writing-mode
+                               (turn to "inverted", disable touch input,
+                               enable hover click)
+-w, --toggle-writing           toggle writing-mode
 ''')
+	sys.exit(errCode)
 
 if __name__ == "__main__":
 	main(sys.argv)

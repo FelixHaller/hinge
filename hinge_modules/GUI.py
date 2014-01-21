@@ -2,6 +2,7 @@ __author__ = 'Felix Haller'
 
 from gi.repository import Gtk
 from gi.repository import AppIndicator3
+import sys,signal
 
 
 class GUI():

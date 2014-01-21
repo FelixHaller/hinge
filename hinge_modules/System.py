@@ -1,5 +1,5 @@
 from subprocess import check_call, Popen, PIPE
-import sys
+import sys, signal
 from hinge_modules.Eraser import Eraser
 from hinge_modules.Stylus import Stylus
 from hinge_modules.Touch import Touch
@@ -15,7 +15,7 @@ class System():
 	"""
 
 	def __init__(self, gui=None):
-		"""4
+		"""
 		It's possible to create a System object with or without having a GUI() object.
 		If one is given the Menus will be created depending on which features the System
 		supports and what devices it has.
@@ -25,13 +25,15 @@ class System():
 		"""
 		self.display = XDevice()
 		self.devices = []
-		self.touchDev = None
-		self.eraserDev = None
-		self.stylusDev = None
+		self._touchDev = None
+		self._eraserDev = None
+		self._stylusDev = None
 		self.retrDeviceNames()
 		self.gui = gui
 		if self.gui is not None:
 			self.addMenusToGUI()
+
+
 
 	def retrDeviceNames(self):
 		"""
@@ -51,19 +53,16 @@ class System():
 			devices.append(line.split(b'\t'))
 
 		for entry in devices:
-			if len(entry) != 3:
-				print("unexpected entry format")
-				continue
-
 			if 'STYLUS' in entry[2].decode("utf-8"):
-				self.stylusDev = Stylus(entry[0].rstrip().decode("UTF-8"))
-				self.devices.append(self.stylusDev)
+				self._stylusDev = Stylus(entry[0].rstrip().decode("UTF-8"))
+				self.devices.append(self._stylusDev)
 			elif 'ERASER' in entry[2].decode("utf-8"):
-				self.eraserDev = Eraser(entry[0].rstrip().decode("UTF-8"))
-				self.devices.append(self.eraserDev)
+				self._eraserDev = Eraser(entry[0].rstrip().decode("UTF-8"))
+				self.devices.append(self._eraserDev)
 			elif 'TOUCH' in entry[2].decode("utf-8"):
-				self.touchDev = Touch(entry[0].rstrip().decode("UTF-8"))
-				self.devices.append(self.touchDev)
+				self._touchDev = Touch(entry[0].rstrip().decode("UTF-8"))
+				self.devices.append(self._touchDev)
+
 
 	def rotateDevices(self, menuItem=None, mode=None):
 		"""
@@ -90,6 +89,7 @@ class System():
 		for device in self.devices:
 			device.rotate(mode)
 
+
 	def addMenusToGUI(self):
 		"""
 		Add rotate entry if there is any device (X, stylus, etc...)
@@ -102,10 +102,10 @@ class System():
 			self.gui.setHeaderLabel("Error: no devices found")
 
 		# if there is a touch device add an menu to en/disable the touch input
-		if self.touchDev is not None:
+		if self.hasTouchDev():
 			self.gui.addMenuEntry(self.gui.menu, "toggle Touch").connect("activate", self.tglFingerTouch)
 
-		if self.stylusDev is not None:
+		if self.hasStylusDev():
 			self.gui.addMenuEntry(self.gui.menu, "toggle Hover-Click").connect("activate", self.tglHoverClick)
 
 
@@ -119,15 +119,16 @@ class System():
 		:type mode: str
 
 		"""
-		if self.touchDev is not None:
+		if self.hasTouchDev():
 			if mode is None:
-				status = self.touchDev.isEnabled()
+				status = self._touchDev.isEnabled()
 				if status:
-					self.touchDev.turn("off")
-				elif status is False:
-					self.touchDev.turn("on")
+					self._touchDev.turn("off")
+				else:
+					self._touchDev.turn("on")
 			else:
-				self.touchDev.turn(mode)
+				self._touchDev.turn(mode)
+
 
 	def tglHoverClick(self, menuItem=None, mode:str=None):
 		"""
@@ -138,12 +139,24 @@ class System():
 		:param mode: turn it "on" or "off"
 		:type mode: str
 		"""
-		if self.stylusDev is not None:
+		if self.hasStylusDev():
 			if mode is None:
-				status = self.stylusDev.isHover()
+				status = self._stylusDev.isHover()
 				if status:
-					self.stylusDev.setHoverClick("0")
+					self._stylusDev.setHoverClick("0")
 				elif not status:
-					self.stylusDev.setHoverClick("1")
+					self._stylusDev.setHoverClick("1")
 			else:
-				self.stylusDev.setHoverClick(mode)
+				self._stylusDev.setHoverClick(mode)
+
+
+	def hasStylusDev(self):
+		return (self._stylusDev is not None)
+
+
+	def hasEraserDev(self):
+		return (self._eraserDev is not None)
+
+
+	def hasTouchDev(self):
+		return (self._touchDev is not None)
