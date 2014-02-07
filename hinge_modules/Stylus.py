@@ -1,6 +1,7 @@
 from hinge_modules.WacomDevice import WacomDevice
 from hinge_modules.Helper import Helper
 from subprocess import Popen, PIPE
+import logging
 
 
 __author__ = 'Felix Haller'
@@ -25,10 +26,10 @@ class Stylus(WacomDevice):
 			return False
 		else:
 			#@todo sollte hier auch irgendeinen return code geben
-			print("can not get hover-click status of" + self._name)
+			logging.critial("can not get hover-click status of" + self._name)
 
 	def setHoverClick(self, mode):
-		if Helper.sendSystemCall('xinput', 'set-prop', self._name, 'Wacom Hover Click', mode):
+		if Helper.sendSystemCall('xinput', 'set-prop', self._name, 'Wacom Hover Click', {0:"0", 1:"1"}[mode]):
 			pass
 		else:
-			print("Error when trying to set Hover click")
+			logging.critial("Error when trying to set Hover click")

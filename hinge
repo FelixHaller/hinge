@@ -24,107 +24,69 @@
 
 
 import sys, getopt
-from hinge_modules.Daemon import Daemon
+from hinge_modules.GUI import GUI
 from hinge_modules.System import System
 
-
 def main(argv):
-	if (len(sys.argv) < 2):
-		printHelp()
+	CLIArgs = sys.argv[1:]
+
+	if len(CLIArgs) == 0:
+		GUI()
 	else:
-		CLIArgs = sys.argv[1:]
+		s = System()
 		try:
 			opts, args = getopt.getopt(CLIArgs,
-									   "hO:odfT:tW:wnr:",
+									   "ghO:ofT:tW:wnr:",
 									   ["flip",
-										"daemon",
 										"help",
-										"Touch=",
+										"touch=",
 										"toggle-touch",
-										"Hover-click=",
+										"hover-click=",
 										"toggle-hover-click",
 										"writing=",
 										"toggle-writing",
 										"normal",
-										"Rotate="
+										"rotate="
 									   ]
 			)
 		except getopt.GetoptError:
 			printHelp(2)
+
 		for opt, arg in opts:
 			if opt in ("-h", "--help"):
 				printHelp()
-			elif opt in ("-d", "--daemon"):
-				Daemon()
 			elif opt in ("-f", "--flip"):
-				System().rotateDevices()
-			elif opt in ("-r", "--Rotate"):
+				s.rotateDevices()
+			elif opt in ("-r", "--rotate"):
 				if arg in ("normal", "left", "right", "inverted"):
-					System().rotateDevices(mode={"normal": 0, "left": 1, "inverted": 2, "right": 3}[arg])
+					s.rotateDevices(mode={"normal": 0, "left": 1, "inverted": 2, "right": 3}[arg])
 				else:
 					printHelp(2)
-			elif opt in ("-T", "--Touch"):
+			elif opt in ("-T", "--touch"):
 				if arg in ("on", "off"):
-					System().tglFingerTouch(mode=arg)
+					s.tglFingerTouch(mode={"on":1, "off":0}[arg])
 				else:
 					printHelp(2)
 			elif opt in ("-t", "--toggle-touch"):
-				System().tglFingerTouch()
-			elif opt in ("-O", "--Hover-click"):
+				s.tglFingerTouch()
+			elif opt in ("-O", "--hover-click"):
 				if arg in ("on", "off"):
-					System().tglHoverClick(mode={"off": "0", "on": "1"}[arg])
+					s.tglHoverClick(mode={"off": 0, "on": 1}[arg])
 				else:
 					printHelp(2)
 			elif opt in ("-o", "--toggle-hover-click"):
-				System().tglHoverClick()
+				s.tglHoverClick()
 			elif opt in ("-W", "--writing"):
-				s = System()
 				if arg in ("on", "off"):
-					writingMode(s, arg)
+					s.tglWritingMode(mode={"on":1, "off":0}[arg])
 				else:
 					printHelp(2)
 			elif opt in ("-w", "--toggle-writing"):
-				s = System()
-				writingMode(s)
+				s.tglWritingMode()
 			elif opt in ("-n", "--normal"):
-				s = System()
-				normalMode(s)
+				s.normalMode()
 
 
-def writingMode(sysObj, arg=None):
-	"""
-	This is a helper function to make it possible to toggle the writing mode
-	(my favorite).
-	The decision which mode to choose depends on the current display orientation.
-	Only if it's in the "normal" state the writing mode will be applied. any other state
-	will lead to the normal (-n) mode to be applied.
-
-	:param sysObj: has to be an instance of hinge_modules.System.System()
-	:param arg: either "on" or "off" or nothing for toggeling
-	"""
-	if arg is None:
-		if sysObj.display.getOrientation() == b'normal':
-			arg = "on"
-		else:
-			normalMode(sysObj)
-			return
-	sysObj.tglHoverClick(mode={"on": "1", "off": "0"}[arg])
-	sysObj.tglFingerTouch(mode={"on": "off", "off": "on"}[arg])
-	sysObj.rotateDevices(mode={"off": 0, "on": 2}[arg])
-
-
-def normalMode(sysObj):
-	"""
-	Activates the normal mode:
-	- normal display/input devices orientation
-	- HoverClick disabled
-	- Touch input enabled
-
-	:param sysObj: has to be an instance of hinge_modules.System.System()
-	"""
-	sysObj.rotateDevices(mode=0)
-	sysObj.tglHoverClick(mode="0")
-	sysObj.tglFingerTouch(mode="on")
 
 
 def printHelp(errCode=0):
@@ -132,12 +94,14 @@ def printHelp(errCode=0):
 '''
 Usage: hinge [options]
 
+If started without parameters, the interactive GUI (Indicator) mode will be started.
+Otherwise the following options are available.
+
 options:
--d                             start daemon
--f, --flip                     flip the rotation of the screen (rotate 180°)
--T, --Touch on,off             enable/disable finger touch input
+-f, --flip                     flip the rotation (toggle normal/inverted)
+-T, --touch on,off             enable/disable finger touch input
 -t, --toggle-touch             toggle finger touch input
--O, --Hover-click on,off       enable/disable wacom hover click
+-O, --hover-click on,off       enable/disable wacom hover click
 -o, --toggle-hover-click       toggle wacom hover click
 -n, --normal                   reset settings to default
 -r, --rotate <orientation>     set a specific orientation (absolute)

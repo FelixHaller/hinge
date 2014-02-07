@@ -6,27 +6,38 @@ from subprocess import check_call, Popen, PIPE
 
 class XDevice():
 	def __init__(self):
-		self.name = ""
-		self.orientation = ""
+		self._name = None
+		self._orientation = None
 		self.rotModes = ["normal", "left", "inverted", "right"]
 
-	def readSettings(self):
+	@property
+	def orientation(self):
+		#@todo eigentlich sollte ein getter keinen komplexeren code ausführen (readSettings)
+		# is necessary to have an up-to-date state (that could have changed externaly) of the devices
+		self._readSettings()
+		return self._orientation
+
+	@property
+	def name(self):
+		return self._name
+
+	def _readSettings(self):
+		"""
+		Reads the current settings of the screen device.
+		Information is obtained with the help of the "xrandr" command.
+
+		"""
 		output = Popen(["xrandr", "--current"], stdout=PIPE).communicate()[0]
 		devices_raw = output.rstrip().split(b'\n')
-		devices = []
 		for line in devices_raw:
 			#take everything before the braces, clean it up and split on spaces
 			line = line.split(b'(')[0].rstrip().split(b' ')
 			if line[0] == b'LVDS1':
-				self.name = line[0]
+				self._name = line[0]
 				if line[-1].decode("utf-8") in self.rotModes:
-					self.orientation = line[-1]
+					self._orientation = line[-1]
 				else:
-					self.orientation = b'normal'
-	def getOrientation(self):
-		#@todo jetzt gibt es doppelte Einträge für getOreientation und orientation
-		self.readSettings()
-		return self.orientation
+					self._orientation = b'normal'
 
 
 	def rotate(self, mode):
