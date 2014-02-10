@@ -34,7 +34,7 @@ class Indicator():
 
 		self._addMenus()
 
-		self.show()
+		self._show()
 
 	def _addMenus(self):
 		"""
@@ -46,7 +46,7 @@ class Indicator():
 		#(it seems the event is triggered). But I do need to set the menuButtons checked anyhow.
 		if not self.core.hasDevices():
 
-			self.setHeaderLabel("Error: no devices found")
+			self._setHeaderLabel("Error: no devices found")
 			return
 
 		else:
@@ -57,35 +57,35 @@ class Indicator():
 			self.menu.add(separator)
 
 			# create the "orientation" subMenu
-			self.rotate = self.addSubMenu("orientation")
+			self.rotate = self._addSubMenu("orientation")
 
-			self.rotateN = self.addMenuItem(self.rotate, "normal", self.core.rotateDevices, 0)
-			self.rotateL = self.addMenuItem(self.rotate, "left", self.core.rotateDevices, 1)
-			self.rotateI = self.addMenuItem(self.rotate, "flipped", self.core.rotateDevices, 2)
-			self.rotateR = self.addMenuItem(self.rotate, "right", self.core.rotateDevices, 3)
+			self.rotateN = self._addMenuItem(self.rotate, "normal", self.core.rotateDevices, 0)
+			self.rotateL = self._addMenuItem(self.rotate, "left", self.core.rotateDevices, 1)
+			self.rotateI = self._addMenuItem(self.rotate, "flipped", self.core.rotateDevices, 2)
+			self.rotateR = self._addMenuItem(self.rotate, "right", self.core.rotateDevices, 3)
 
-			self.normal = self.addMenuItem(self.menu, "-> normal mode", self.normalHandler)
+			self.normal = self._addMenuItem(self.menu, "-> normal mode", self._normalHandler)
 
 
 		# if there is a touch device add a menu to en/disable the touch input
 		if self.core.hasTouchDev():
-			self.tglTouch = self.addCheckMenuItem(self.menu, "Touch", self.touchHandler)
+			self.tglTouch = self._addCheckMenuItem(self.menu, "Touch", self._touchHandler)
 			self.tglTouch.set_active(self.core.touchDev.isEnabled)
 
 		# if there is a stylus device add a menu to en/disable the hover click and the writing mode
 		if self.core.hasStylusDev():
-			self.tglHover = self.addCheckMenuItem(self.menu, "Hover-Click", self.hoverHandler)
+			self.tglHover = self._addCheckMenuItem(self.menu, "Hover-Click", self._hoverHandler)
 			self.tglHover.set_active(self.core.stylusDev.isHover())
 
-			self.writing = self.addMenuItem(self.menu, "-> enter writing-mode", self.writingHandler)
+			self.writing = self._addMenuItem(self.menu, "-> enter writing-mode", self._writingHandler)
 
-	def hoverHandler(self, subMenu):
+	def _hoverHandler(self, subMenu):
 		self.core.tglHoverClick(menuItem = subMenu)
 
-	def touchHandler(self, subMenu):
+	def _touchHandler(self, subMenu):
 		self.core.tglFingerTouch(menuItem = subMenu)
 
-	def writingHandler(self, subMenu):
+	def _writingHandler(self, subMenu):
 		"""
 		This method is the handler for the writing mode button.
 		In contrast to the cli here we do not only call the core methods, as we need
@@ -94,18 +94,20 @@ class Indicator():
 		:param subMenu:
 		"""
 
-		# enable hover click
-		self.tglHover.set_active(True)
-		self.core.tglHoverClick(mode=1)
+		if self.core.hasStylusDev():
+			# enable hover click
+			self.tglHover.set_active(True)
+			self.core.tglHoverClick(mode=1)
 
-		# disable the finger touch input
-		self.tglTouch.set_active(False)
-		self.core.tglFingerTouch(mode=0)
+		if self.core.hasTouchDev():
+			# disable the finger touch input
+			self.tglTouch.set_active(False)
+			self.core.tglFingerTouch(mode=0)
 
 		# flip the screen
 		self.rotateI.activate()
 
-	def normalHandler(self, subMenu):
+	def _normalHandler(self, subMenu):
 		"""
 		This method is the handler for the normal mode button.
 		In contrast to the cli here we do not only call the core methods, as we need
@@ -113,22 +115,24 @@ class Indicator():
 
 		:param subMenu:
 		"""
-		#disable Hover-Click
-		self.tglHover.set_active(False)
-		self.core.tglHoverClick(mode=0)
+		if self.core.hasStylusDev():
+			#disable Hover-Click
+			self.tglHover.set_active(False)
+			self.core.tglHoverClick(mode=0)
 
-		# enable the finger touch input
-		self.tglTouch.set_active(True)
-		self.core.tglFingerTouch(mode=1)
+		if self.core.hasTouchDev():
+			# enable the finger touch input
+			self.tglTouch.set_active(True)
+			self.core.tglFingerTouch(mode=1)
 
 		# flip the screen
 		self.rotateN.activate()
 
-	def setHeaderLabel(self, caption):
+	def _setHeaderLabel(self, caption):
 		self.headerLabel.set_label(caption)
 
 
-	def addSubMenu(self, caption):
+	def _addSubMenu(self, caption):
 		"""
 		Add a submenu to the main indicator menu.
 
@@ -146,7 +150,7 @@ class Indicator():
 
 		return subMenu
 
-	def addCheckMenuItem(self, subMenu, caption, callback):
+	def _addCheckMenuItem(self, subMenu, caption, callback):
 		entry = CheckMenuItem(caption)
 		handler = entry.connect("activate", callback)
 
@@ -156,7 +160,7 @@ class Indicator():
 
 		return entry
 
-	def addMenuItem(self, subMenu, caption, callback, *args):
+	def _addMenuItem(self, subMenu, caption, callback, *args):
 		entry = MenuItem(caption)
 		entry.connect("activate", callback, *args)
 
@@ -165,5 +169,5 @@ class Indicator():
 
 		return entry
 
-	def show(self):
+	def _show(self):
 		Gtk.main()

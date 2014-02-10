@@ -18,7 +18,7 @@ class System():
 	def __init__(self):
 		"""
 		It's possible to create a System object with or without having a GUI() object.
-		If one is given the Menus will be created depending on which features the System
+		If one is given the menus will be created depending on which features the System
 		supports and what devices it has.
 
 		:param gui: a reference to the created GUI (indicator, tray icon, ...)
@@ -40,6 +40,7 @@ class System():
 
 		#and retrieve all wacom devices
 		self._retrWacomDeviceNames()
+
 	@property
 	def touchDev(self):
 		return self._touchDev
@@ -53,7 +54,7 @@ class System():
 		return self._eraserDev
 
 	def hasDevices(self):
-		return(self.devices.__len__() > 0)
+		return (self.devices.__len__() > 0)
 
 	def _retrWacomDeviceNames(self):
 		"""
@@ -135,6 +136,7 @@ class System():
 			else:
 				self._touchDev.switch(not self._touchDev.isEnabled)
 		logging.warning("FINGER " + str(mode))
+
 	def tglHoverClick(self, menuItem=None, mode:int=None):
 		"""
 		Turn the "hover click" feature of your wacom stylus device on or off. If no mode is given then toggle.
@@ -156,7 +158,7 @@ class System():
 					self._stylusDev.setHoverClick(0)
 				elif not status:
 					self._stylusDev.setHoverClick(1)
-		logging.warning("HOVER "+ str(mode))
+		logging.warning("HOVER " + str(mode))
 
 	def normalMode(self, menuItem=None):
 		"""
@@ -189,7 +191,7 @@ class System():
 				self.normalMode()
 				return
 		self.tglHoverClick(mode=mode)
-		self.tglFingerTouch(mode={0:1,1:0}[mode])
+		self.tglFingerTouch(mode={0: 1, 1: 0}[mode])
 		self.rotateDevices(mode={0: 0, 1: 2}[mode])
 
 	def hasStylusDev(self):
