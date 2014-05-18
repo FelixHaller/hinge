@@ -135,7 +135,6 @@ class System():
 				self._touchDev.switch(mode)
 			else:
 				self._touchDev.switch(not self._touchDev.isEnabled)
-		logging.warning("FINGER " + str(mode))
 
 	def tglHoverClick(self, menuItem=None, mode:int=None):
 		"""
@@ -158,7 +157,6 @@ class System():
 					self._stylusDev.setHoverClick(0)
 				elif not status:
 					self._stylusDev.setHoverClick(1)
-		logging.warning("HOVER " + str(mode))
 
 	def normalMode(self, menuItem=None):
 		"""

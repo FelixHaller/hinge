@@ -22,7 +22,7 @@ class Indicator():
 		self.core = core
 		self.ind = AppIndicator3.Indicator.new(
 			"hinge", # indicator name
-			"python", # standard icon
+			"/home/felix/Design/icons/hinge/hinge.svg", # standard icon
 			AppIndicator3.IndicatorCategory.HARDWARE)
 		self.menu = Menu()
 		self.buttonHandlers = {}
@@ -142,7 +142,7 @@ class Indicator():
 		"""
 		subMenu = Gtk.Menu()
 
-		items = Gtk.MenuItem(caption)
+		items = Gtk.MenuItem(label=caption)
 		items.set_submenu(subMenu)
 		items.show()
 

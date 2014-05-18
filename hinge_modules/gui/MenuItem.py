@@ -4,5 +4,5 @@ __author__ = 'Felix Haller'
 
 class MenuItem(Gtk.MenuItem):
 	def __init__(self, caption):
-		super().__init__(caption)
+		super().__init__(label = caption)
 		self.show()

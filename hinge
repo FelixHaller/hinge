@@ -24,13 +24,14 @@
 
 
 import sys, getopt
-from hinge_modules.GUI import GUI
+
 from hinge_modules.System import System
 
 def main(argv):
 	CLIArgs = sys.argv[1:]
 
 	if len(CLIArgs) == 0:
+		from hinge_modules.GUI import GUI
 		GUI()
 	else:
 		s = System()
